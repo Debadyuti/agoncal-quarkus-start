@@ -1,5 +1,8 @@
 package org.agoncal.quarkus.starting;
 
+import org.jboss.logging.Logger;
+
+import javax.inject.Inject;
 import javax.print.attribute.standard.Media;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,27 +16,30 @@ import java.util.Optional;
 @Produces(MediaType.APPLICATION_JSON)
 public class BookResource {
 
+    @Inject
+    BookRepository repository;
+    @Inject
+    Logger logger;  //org.jboss.logging
+
     @GET
     public List<Book> getAllBooks() {
-        return List.of(
-                new Book(1, "Understanding Quarkus", "Antonio", 2020, "IT"),
-                new Book(2, "Practising Quarkus", "Antonio", 2020, "IT"),
-                new Book(3, "Effective Java", "Josh Blocj", 2001, "IT"),
-                new Book(4, "Thinking in Java", "Bruce Eckel", 1998, "IT")
-        );
+        logger.info("Returns all books");
+        return repository.getAllBooks();
     }
 
     @GET
     @Path("/count")
     @Produces(MediaType.TEXT_PLAIN)
     public int countAllBooks(){
-        return getAllBooks().size();
+        logger.info("Returns the number of books");
+        return repository.getAllBooks().size();
     }
 
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Optional <Book> getBook(@PathParam("id") int id){
-        return getAllBooks().stream().filter(book -> book.id == id).findFirst();
+        logger.info("Returns a single book with id " + id);
+        return repository.getBook(id);
     }
 }
